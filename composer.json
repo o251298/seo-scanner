@@ -1,0 +1,21 @@
+{
+    "name": "khrokalo/seo-scanner",
+    "description": "Simple seo scanner",
+    "type": "library",
+    "require": {
+        "php": "^8.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Khrokalo\\SeoScanner\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Oleh Khrokalo",
+            "email": "o251298@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
