@@ -5,11 +5,15 @@ namespace Khrokalo\SeoScanner;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Khrokalo\SeoScanner\Result\SeoScannerPageResult;
-use Khrokalo\SeoScanner\Result\SeoScannerResult;
 use Symfony\Component\DomCrawler\Crawler;
 
 class SeoScanner
 {
+
+    /**
+     * @var SeoScannerPageResult[]
+     */
+    private array $resultsCache = [];
 
     public function __construct(private ClientInterface $client)
     {
@@ -18,6 +22,9 @@ class SeoScanner
     public function scanPage(string $url) : SeoScannerPageResult
     {
         assert(self::isValidUrl($url));
+        if (array_key_exists($url, $this->resultsCache)) {
+            return $this->resultsCache[$url];
+        }
         $start = microtime(true);
         $response = $this->client->request('GET', $url);
         $timeMs = (microtime(true) - $start) * 1000;
@@ -32,7 +39,9 @@ class SeoScanner
         $h1Count = $crawler->filter('body h1')->count();
         $imgCount = $crawler->filter('body img')->count();
         $imgWithoutAlt = $crawler->filter('img:not([alt]), img[alt=""]')->count();
-        return new SeoScannerPageResult($statusCode, $timeMs, $hasTitle, $hasMeta, $h1Count, $imgCount, $imgWithoutAlt, []);
+        $result = new SeoScannerPageResult($statusCode, $timeMs, $hasTitle, $hasMeta, $h1Count, $imgCount, $imgWithoutAlt, []);
+        $this->resultsCache[$url] = $result;
+        return $result;
     }
 
     private function isValidUrl(string $url) : bool
